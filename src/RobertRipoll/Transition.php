@@ -9,9 +9,9 @@ class Transition
 	private State $from;
 	private State $to;
 	private ?Closure $when;
-	private ?string $name;
+	private string $name;
 
-	public function __construct(State $from, State $to, ?Closure $when = null, ?string $name = null)
+	public function __construct(State $from, State $to, string $name = null, ?Closure $when = null)
 	{
 		$this->from = $from;
 		$this->to = $to;
@@ -34,7 +34,7 @@ class Transition
 		return $this->when;
 	}
 
-	public function getName(): ?string
+	public function getName(): string
 	{
 		return $this->name;
 	}
@@ -45,6 +45,6 @@ class Transition
 			return true;
 		}
 
-		return $when($this, $subject);
+		return $when($subject, $this);
 	}
 }

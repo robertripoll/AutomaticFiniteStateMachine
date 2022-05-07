@@ -2,6 +2,8 @@
 
 namespace RobertRipoll;
 
+use InvalidArgumentException;
+
 /**
  *
  */
@@ -56,6 +58,28 @@ class FiniteStateMachine
 		return $states[$state] ?: null;
 	}
 
+	public function can(string $transitionName): bool
+	{
+		$transition = $this->definition->getTransitions()[$transitionName] ?: null;
+
+		return $transition && $transition->isApplicable($this->subject);
+	}
+
+	public function apply(string $transitionName)
+	{
+		$transition = $this->definition->getTransitions()[$transitionName] ?: null;
+
+		if (!$transition) {
+			throw new InvalidArgumentException("No transition with name $transitionName exists");
+		}
+
+		if (!$transition->isApplicable($this->subject)) {
+			throw new \RuntimeException("Transition with name $transitionName cannot be applied");
+		}
+
+		$this->setState($transition->getTo());
+	}
+
 	protected function setState(State $state)
 	{
 		$this->stateStore->setState($this->subject, $state);
@@ -64,14 +88,15 @@ class FiniteStateMachine
 	public function getAvailableTransitions(): array
 	{
 		$transitions = $this->definition->getTransitions();
-		$availableTransitions = $transitions[$this->getState()->getValue()];
-
 		$result = [];
 
-		foreach ($availableTransitions as $transition)
+		foreach ($transitions as $transition)
 		{
-			if ($transition->isApplicable($this->subject)) {
-				$result[] = $transition;
+			if ($transition->getFrom()->getValue() == $this->getState()->getName())
+			{
+				if ($transition->isApplicable($this->subject)) {
+					$result[$transition->getName()] = $transition;
+				}
 			}
 		}
 

@@ -6,9 +6,9 @@ class State
 {
 	/** @var int|string $value */
 	private $value;
-	private ?string $name;
+	private string $name;
 
-	public function __construct($value, ?string $name = null)
+	public function __construct($value, string $name)
 	{
 		$this->value = $value;
 		$this->name = $name;
@@ -19,7 +19,7 @@ class State
 		return $this->value;
 	}
 
-	public function getName(): ?string
+	public function getName(): string
 	{
 		return $this->name;
 	}

@@ -26,7 +26,7 @@ class Definition
 		$this->states = $this->transitions = [];
 
 		foreach ($states as $state) {
-			$this->states[$state->getValue()] = $state;
+			$this->states[$state->getName()] = $state;
 		}
 
 		if (!array_key_exists($initialState->getValue(), $this->states)) {
@@ -35,9 +35,9 @@ class Definition
 
 		$this->initialState = $initialState;
 
-		foreach ($transitions as $index => $transition)
+		foreach ($transitions as $transition)
 		{
-			$name = $transition->getName() ?: "#$index";
+			$name = $transition->getName();
 			$from = $transition->getFrom()->getValue();
 			$to = $transition->getTo()->getValue();
 
@@ -49,7 +49,7 @@ class Definition
 				throw new InvalidArgumentException('$to used in transition ' . $name . ' is not a member of $states');
 			}
 
-			$this->transitions[$from][] = $transition;
+			$this->transitions[$name] = $transition;
 		}
 	}
 

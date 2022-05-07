@@ -21,7 +21,7 @@ class AutomaticFiniteStateMachine extends FiniteStateMachine
 		}
 
 		if (count($transitions) > 1) {
-			throw new RuntimeException("Only 1 transition can be available");
+			throw new RuntimeException("Only 1 transition can be available at the same time");
 		}
 
 		return current($transitions);
