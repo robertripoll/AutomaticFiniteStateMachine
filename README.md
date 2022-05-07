@@ -40,7 +40,7 @@ $states = [
 
 // The transitions between the possible finite machine nodes
 $transitions = [
-  new Transition($initialState, $paidState, "pay"),
+  new Transition($initialState, $paidState, 'pay'),
   new Transition($paidState, $preparingState, 'prepare', fn (object $order) => $paymentService->isPaid($order->id)),
   new Transition($preparingState, $shippedState, 'ship'),
 ];
@@ -59,7 +59,7 @@ $stateStore = new class () implements StateStoreInterface {
   }
 };
 
-$stateMachine = new AutomaticFiniteStateMachine($definition, $order, $stateStore, 'Traditional finite state machine');
+$stateMachine = new FiniteStateMachine($definition, $order, $stateStore, 'Traditional finite state machine');
 
 if ($stateMachine->can('prepare')) {
   $stateMachine->apply('prepare');
