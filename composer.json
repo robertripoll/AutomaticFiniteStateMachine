@@ -15,6 +15,6 @@
 	"php": ">=7.4"
   },
   "autoload": {
-	"psr-4": { "RobertRipoll\\": "" }
+	"psr-4": { "RobertRipoll\\": "src/RobertRipoll/" }
   }
 }
