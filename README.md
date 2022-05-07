@@ -2,7 +2,7 @@
 
 A basic PHP Finite State Machine, based on [Symfony Workflows](https://github.com/symfony/workflow).
 
-It allows the creation and use of automatic finite state machines, that is, they apply transitions based on the current
+It allows the creation and usage of automatic finite state machines, that is, they apply transitions based on the current
 state and the possible transitions available.
 
 ## Installation

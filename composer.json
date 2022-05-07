@@ -1,6 +1,6 @@
 {
   "name": "robertripoll/automatic-finite-state-machine",
-  "description": "A basic Finite State Machine, based on Symfony Workflows. It allows the creation and use of automatic finite state machines, that is, they apply transitions based on the current state and the possible transitions available.",
+  "description": "A basic Finite State Machine, based on Symfony Workflows. It allows the creation and usage of automatic finite state machines, that is, they apply transitions based on the current state and the possible transitions available.",
   "keywords": ["automatic", "finite", "state", "machine"],
   "type": "library",
   "version": "0.0.1",
