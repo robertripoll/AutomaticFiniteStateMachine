@@ -5,8 +5,10 @@ namespace RobertRipoll\Events;
 use RobertRipoll\FiniteStateMachine;
 use RobertRipoll\State;
 
-class StateChangedEvent
+class StateChangedEvent implements FiniteStateMachineEventInterface
 {
+	public const EVENT_NAME = 'state.changed';
+
 	private FiniteStateMachine $stateMachine;
 	private ?State $oldState;
 	private State $newState;
@@ -18,6 +20,11 @@ class StateChangedEvent
 		$this->oldState = $oldState;
 		$this->newState = $newState;
 		$this->subject = $stateMachine->getSubject();
+	}
+
+	public function getEventName() : string
+	{
+		return self::EVENT_NAME;
 	}
 
 	/**

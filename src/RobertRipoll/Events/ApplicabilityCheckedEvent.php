@@ -5,8 +5,10 @@ namespace RobertRipoll\Events;
 use RobertRipoll\FiniteStateMachine;
 use RobertRipoll\Transition;
 
-class ApplicabilityCheckedEvent
+class ApplicabilityCheckedEvent implements FiniteStateMachineEventInterface
 {
+	public const EVENT_NAME = 'applicability.checked';
+
 	private FiniteStateMachine $stateMachine;
 	private Transition $transition;
 	private bool $isApplicable;
@@ -18,6 +20,11 @@ class ApplicabilityCheckedEvent
 		$this->transition = $transition;
 		$this->isApplicable = $isApplicable;
 		$this->subject = $stateMachine->getSubject();
+	}
+
+	public function getEventName() : string
+	{
+		return self::EVENT_NAME;
 	}
 
 	/**
