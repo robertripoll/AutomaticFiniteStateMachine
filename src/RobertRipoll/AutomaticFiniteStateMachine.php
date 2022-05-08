@@ -6,10 +6,15 @@ use RuntimeException;
 
 class AutomaticFiniteStateMachine extends FiniteStateMachine
 {
-	public function getAvailableTransitions() : array
+	public function can(string $transitionName) : bool
 	{
-		$transitions = parent::getAvailableTransitions();
-		return [current($transitions)];
+		// Transitions cannot be applied manually since they are applied automatically :)
+		return false;
+	}
+
+	public function apply(string $transitionName)
+	{
+		// Transitions cannot be applied manually since they are applied automatically :)
 	}
 
 	public function getAvailableTransition(): ?Transition
