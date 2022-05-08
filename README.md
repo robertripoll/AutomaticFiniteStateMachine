@@ -64,7 +64,6 @@ $stateMachine = new FiniteStateMachine($definition, $order, $stateStore, 'Tradit
 if ($stateMachine->can('prepare')) {
   $stateMachine->apply('prepare');
 }
-
 ```
 
 ### Automatic Finite State Machine
@@ -74,7 +73,6 @@ if ($stateMachine->can('prepare')) {
 
 use RobertRipoll\AutomaticFiniteStateMachine;
 use RobertRipoll\Definition;
-use RobertRipoll\FiniteStateMachine;
 use RobertRipoll\State;
 use RobertRipoll\StateStoreInterface;
 use RobertRipoll\Transition;
@@ -94,9 +92,9 @@ $states = [
 
 // The transitions between the possible finite machine nodes
 $transitions = [
-  new Transition($initialState, $paidState, fn (object $order) => $paymentService->isPaid($order->id)),
-  new Transition($paidState, $preparingState),
-  new Transition($preparingState, $shippedState, fn (object $order) => $shipmentService->isShipped($order->id)),
+  new Transition($initialState, $paidState, 'pay', fn (object $order) => $paymentService->isPaid($order->id)),
+  new Transition($paidState, $preparingState, 'prepare'),
+  new Transition($preparingState, $shippedState, 'ship', fn (object $order) => $shipmentService->isShipped($order->id)),
 ];
 
 // The definition of the finite machine
@@ -104,12 +102,12 @@ $definition = new Definition($states, $initialState, $transitions);
 
 // The logic behind the retrieval and storage of the state
 $stateStore = new class () implements StateStoreInterface {
-  public function getState(object $order) {
-    return $order->status;
+  public function getState(object $subject) {
+    return $subject->status;
   }
 
-  public function setState(object $order, $newState) {
-    $order->status = $newState;
+  public function setState(object $subject, $newState) {
+    $subject->status = $newState;
   }
 };
 
