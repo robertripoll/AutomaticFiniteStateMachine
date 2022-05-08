@@ -49,16 +49,16 @@ $definition = new Definition($states, $initialState, $transitions);
 
 // The logic behind the retrieval and storage of the state
 $stateStore = new class () implements StateStoreInterface {
-  public function getState(object $order) {
-    return $order->status;
+  public function getState(object $subject) {
+    return $subject->status;
   }
 
-  public function setState(object $order, $newState) {
-    $order->status = $newState;
+  public function setState(object $subject, $newState): void {
+    $subject->status = $newState;
   }
 };
 
-$stateMachine = new FiniteStateMachine($definition, $order, $stateStore, 'Traditional finite state machine');
+$stateMachine = new FiniteStateMachine($definition, $order, $stateStore, null, 'Traditional finite state machine');
 
 if ($stateMachine->can('prepare')) {
   $stateMachine->apply('prepare');
@@ -72,6 +72,8 @@ if ($stateMachine->can('prepare')) {
 
 use RobertRipoll\AutomaticFiniteStateMachine;
 use RobertRipoll\Definition;
+use RobertRipoll\Events\FiniteStateMachineEventInterface;
+use RobertRipoll\Events\StateChangedEvent;
 use RobertRipoll\State;
 use RobertRipoll\StateStoreInterface;
 use RobertRipoll\Transition;
@@ -105,11 +107,31 @@ $stateStore = new class () implements StateStoreInterface {
     return $subject->status;
   }
 
-  public function setState(object $subject, $newState) {
+  public function setState(object $subject, $newState): void {
     $subject->status = $newState;
   }
 };
 
-$stateMachine = new AutomaticFiniteStateMachine($definition, $order, $stateStore, 'Automatic finite state machine');
+$eventDispatcher = new class ($logService) implements EventDispatcherInterface {
+  private LogService $logService;
+
+  public function __construct(LogService $logService) {
+    $this->logService = $logService;
+  }
+
+  public function dispatch(object $event)
+  {
+    /** @var FiniteStateMachineEventInterface $event */
+
+    if ($event->getEventName() == StateChangedEvent::EVENT_NAME)
+    {
+      /** @var StateChangedEvent $event */
+      $oldState = $event->hasOldState() ? $event->getOldState()->getValue() : 'null';
+      $logService->log("Subject state changed from $oldState to {$event->getNewState()->getValue()}");
+    }
+  }
+};
+
+$stateMachine = new AutomaticFiniteStateMachine($definition, $order, $stateStore, $eventDispatcher, 'Automatic finite state machine');
 $stateMachine->run();
 ```
