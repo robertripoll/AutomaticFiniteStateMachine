@@ -3,6 +3,10 @@
 namespace RobertRipoll;
 
 use InvalidArgumentException;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use RobertRipoll\events\ApplicabilityCheckedEvent;
+use RobertRipoll\events\StateChangedEvent;
+use RuntimeException;
 
 /**
  *
@@ -15,14 +19,23 @@ class FiniteStateMachine
 	protected object $subject;
 	/** @var StateStoreInterface Contains the logic for getting and storing the state into the subject */
 	protected StateStoreInterface $stateStore;
+	/** @var ?EventDispatcherInterface */
+	protected ?EventDispatcherInterface $eventDispatcher;
 	/** @var ?string Name of the finite state machine */
 	protected ?string $name;
 
-	public function __construct(Definition $definition, object $subject, StateStoreInterface $stateStore, ?string $name = null)
+	public function __construct(
+		Definition               $definition,
+		object                   $subject,
+		StateStoreInterface      $stateStore,
+		EventDispatcherInterface $eventDispatcher = null,
+		?string                  $name = null
+	)
 	{
 		$this->definition = $definition;
 		$this->subject = $subject;
 		$this->stateStore = $stateStore;
+		$this->eventDispatcher = $eventDispatcher;
 		$this->name = $name;
 	}
 
@@ -46,6 +59,11 @@ class FiniteStateMachine
 		return $this->name;
 	}
 
+	public function hasState(): bool
+	{
+		return (bool)$this->getState();
+	}
+
 	public function getState(): ?State
 	{
 		$states = $this->definition->getStates();
@@ -65,7 +83,7 @@ class FiniteStateMachine
 		return $transition && $transition->isApplicable($this->subject);
 	}
 
-	public function apply(string $transitionName)
+	public function apply(string $transitionName): void
 	{
 		$transition = $this->definition->getTransitions()[$transitionName] ?: null;
 
@@ -73,16 +91,30 @@ class FiniteStateMachine
 			throw new InvalidArgumentException("No transition with name $transitionName exists");
 		}
 
-		if (!$transition->isApplicable($this->subject)) {
-			throw new \RuntimeException("Transition with name $transitionName cannot be applied");
+		$isApplicable = $transition->isApplicable($this->subject);
+
+		if ($this->eventDispatcher)
+		{
+			/** @var ApplicabilityCheckedEvent $event */
+			$event = $this->eventDispatcher->dispatch(new ApplicabilityCheckedEvent($this, $transition, $isApplicable));
+			$isApplicable = $event->isApplicable();
+		}
+
+		if (!$isApplicable) {
+			throw new RuntimeException("Transition with name $transitionName cannot be applied");
 		}
 
 		$this->setState($transition->getTo());
 	}
 
-	protected function setState(State $state)
+	protected function setState(State $state): void
 	{
+		$oldState = $this->getState();
 		$this->stateStore->setState($this->subject, $state);
+
+		if ($this->eventDispatcher) {
+			$this->eventDispatcher->dispatch(new StateChangedEvent($this, $oldState, $state));
+		}
 	}
 
 	public function getAvailableTransitions(): array

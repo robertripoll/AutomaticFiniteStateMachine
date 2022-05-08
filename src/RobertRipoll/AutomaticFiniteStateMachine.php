@@ -6,13 +6,13 @@ use RuntimeException;
 
 class AutomaticFiniteStateMachine extends FiniteStateMachine
 {
-	public function can(string $transitionName) : bool
+	public function can(string $transitionName): bool
 	{
 		// Transitions cannot be applied manually since they are applied automatically :)
 		return false;
 	}
 
-	public function apply(string $transitionName)
+	public function apply(string $transitionName): void
 	{
 		// Transitions cannot be applied manually since they are applied automatically :)
 	}
@@ -34,7 +34,7 @@ class AutomaticFiniteStateMachine extends FiniteStateMachine
 
 	public function run(): bool
 	{
-		if ($this->getState() === null)
+		if (!$this->hasState())
 		{
 			$this->setState($this->definition->getInitialState());
 			return true;

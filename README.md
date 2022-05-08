@@ -18,7 +18,6 @@ $ composer require robertripoll/automatic-finite-state-machine
 ```php
 <?php
 
-use RobertRipoll\AutomaticFiniteStateMachine;
 use RobertRipoll\Definition;
 use RobertRipoll\FiniteStateMachine;
 use RobertRipoll\State;
