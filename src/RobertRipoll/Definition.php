@@ -29,7 +29,7 @@ class Definition
 			$this->states[$state->getName()] = $state;
 		}
 
-		if (!array_key_exists($initialState->getValue(), $this->states)) {
+		if (!array_key_exists($initialState->getName(), $this->states)) {
 			throw new InvalidArgumentException('$initialState must be a member of $states');
 		}
 
@@ -38,8 +38,8 @@ class Definition
 		foreach ($transitions as $transition)
 		{
 			$name = $transition->getName();
-			$from = $transition->getFrom()->getValue();
-			$to = $transition->getTo()->getValue();
+			$from = $transition->getFrom()->getName();
+			$to = $transition->getTo()->getName();
 
 			if (!array_key_exists($from, $this->states)) {
 				throw new InvalidArgumentException('$from used in transition ' . $name . ' is not a member of $states');
